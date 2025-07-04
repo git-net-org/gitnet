@@ -63,20 +63,23 @@ And instantly getting:
 - Think: GitHub meets Discord, but organized by repo context
 
 ---
+## 🤝 Contributing         
 
+We welcome contributions of all kinds — bug reports, feature suggestions, or even whole PRs!
+
+Please read our [**Contributing Guidelines**](CONTRIBUTING.md) before submitting a PR.
 ## ⚙️ Setup Instructions
-
-> Full setup guide coming soon. Basic overview below.
 
 1. Clone the repo
    ```bash
    git clone url
    cd gitnet
 2.  Install dependencies
+   ````bash
+   cd frontend  # for frontend
+   npm install
 
-````
-cd frontend  # for frontend
-npm install
+   cd ../backend  # for backend
+   npm install
 
-cd ../backend  # for backend
-npm install
+
