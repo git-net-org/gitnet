@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  githubId     String        @unique
+  username     String        @unique
+  avatar       String
+  email        String        @unique
+  createdAt    DateTime      @default(now())
+
+  // Self-referencing many-to-many relation
+  connectionsInitiated Connections[] @relation("UserConnectionsInitiated")
+  connectionsReceived  Connections[] @relation("UserConnectionsReceived")
+
+   sentMessages     Messages[] @relation("SentMessages")
+  receivedMessages Messages[] @relation("ReceivedMessages")
+}
+
+model Connections {
+  id            String   @id @default(uuid())
+
+  userId        String
+  connectionId  String
+
+  user          User     @relation("UserConnectionsInitiated", fields: [userId], references: [id])
+  connectedUser User     @relation("UserConnectionsReceived", fields: [connectionId], references: [id])
+  
+  @@unique([userId, connectionId])
+}
+model Messages {
+  id            String   @id @default(uuid())
+  connectionId  String
+  senderId      String
+  receiverId    String
+  content       String
+  sentAt        DateTime @default(now())
+
+  sender        User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver      User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+}
+
