@@ -2,36 +2,22 @@
 
 Don't worry - setting up the database is easier than you think! Just follow these simple steps.
 
-<!-- ## What You Need First
+**📖 Want to understand the database structure?** Check out [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) for detailed information about tables and relationships.
 
-- A computer with internet 🌐
-- Node.js installed (we'll check this)
-- That's it! No complex database software needed.
+## Step 1: Create Your Free Database (3 minutes!)
 
-## Step 1: Check if Node.js is Ready
-
-Open your terminal and type:
-```bash
-node --version
-```
-
-If you see a version number like `v18.0.0` or higher, you're good! 
-If not, download Node.js from [nodejs.org](https://nodejs.org/) -->
-
-## Step 2: Create Your Free Database (3 minutes!)
-
-### 2.1 Go to Neon
+### 1.1 Go to Neon
 1. Visit [neon.tech](https://neon.tech/)
 2. Click the big **"Sign up"** button
 3. Choose **"Continue with GitHub"** (easiest option)
 
-### 2.2 Create Your Database
+### 1.2 Create Your Database
 1. You'll see a page asking for project details
 2. Just type a name like `gitnet-database` 
 3. Click **"Create Project"**
 4. Wait 30 seconds... Done! 🎉
 
-### 2.3 Get Your Database Link
+### 1.3 Get Your Database Link
 1. Look for a box that says **"Connection string"**
 2. Copy the long text that starts with `postgresql://`
 3. Save it somewhere - you'll need it in the next step!
@@ -41,22 +27,22 @@ It looks like this:
 postgresql://username:password@hostname:5432/database_name?sslmode=require
 ```
 
-## Step 3: Set Up Your Project Files
+## Step 2: Set Up Your Project Files
 
-### 3.1 Navigate to the Backend Folder
+### 2.1 Navigate to the Backend Folder
 ```bash
 cd backend
 ```
 
-### 3.2 Copy the Example File
+### 2.2 Copy the Example File
 ```bash
 cp .env.example .env.local
 ```
 
-### 3.3 Add Your Database Link
+### 2.3 Add Your Database Link
 1. Open the file `.env.local` in any text editor
 2. Find the line that says `DATABASE_URL=`
-3. Replace the placeholder text with your database link from Step 2.3
+3. Replace the placeholder text with your database link from Step 1.3
 4. Save the file
 
 Your file should look like this:
@@ -66,34 +52,37 @@ DATABASE_URL='postgresql://your_actual_database_link_here'
 
 **Important**: Keep the single quotes around your database link!
 
-## Step 4: Install Everything (Auto-magic!)
+## Step 3: Install Everything (Auto-magic!)
 
 Run these commands one by one:
 
-### 4.1 Install Project Dependencies
+### 3.1 Install Project Dependencies
 ```bash
 pnpm install
 ```
 *Don't have pnpm? Use: `npm install`*
 
-### 4.2 Set Up the Database Structure
+### 3.2 Set Up the Database Structure
 ```bash
 npx prisma generate
 ```
 
-### 4.3 Create Database Tables
+
+### 3.3 Create Database Tables
 ```bash
 npx prisma migrate deploy
 ```
 
-### 4.4 Test It Works
+### 3.4 Test It Works
 ```bash
 npx prisma studio
 ```
 
 This should open a webpage where you can see your database tables. If it works, you're done! 🎉
 
-## Step 5: Run Your App
+**💡 Want to understand what these tables do?** Check out [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) for detailed explanations.
+
+## Step 4: Run Your App
 
 ### Start the Backend
 ```bash
@@ -107,6 +96,16 @@ pnpm dev
 ```
 
 Visit `http://localhost:3000` - your app should be running!
+
+## 📊 Understanding the Database
+
+The database has 4 main tables:
+- **Users**: GitHub profile information
+- **Connections**: Direct user connections
+- **FilteredConnections**: GitHub-based connections with permissions
+- **Messages**: Chat messages between users
+
+For detailed schema information, see [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md).
 
 ## ❓ Something Not Working?
 
