@@ -19,12 +19,24 @@ export interface IUserActions{
 
 export interface IConnection {
   id: string;
-  userId: string;         // initiator
-  connectionId: string;   // the person who was followed
+  userId?: string;         // initiator
+  connectedUserId?: string;   // the person who was followed
+  connectionId:string;
+  isConversationInvited: boolean,
+  isPlatformInvited:boolean,
 
-  user?: IUser;         
-  connectedUser?: IUser;  
-  isMutual? : boolean;
+  isMutual : boolean;
+  isFollower:boolean;
+  isFollowing: boolean;
+  
+  allowed?:boolean;
+
+  invitedBy?:string,
+  connectedAt:Date,
+  connectionStatus:string,
+  createdAt:Date,
+  user: IUser;         
+  connectedUser: IUser;  
 }
 
 export interface IConnectionsStore {
@@ -50,4 +62,18 @@ export interface SocketStore {
   socketId: string | null;
   createSocketConnection: () => void;
   disconnectSocketConnection: () => void;
+}
+
+export interface ChatMessage {
+  senderId: string;
+  content: string;
+  connectionId: string;  
+  receiverId: string;  
+  sentAt?: Date;
+}
+
+export interface MessageStore {
+  message:Record<string, ChatMessage[]>;
+  setMessage: (message:ChatMessage)=>void; //to update message stae onm frontend
+  populateMessage: (connectionId: string)=>Promise<void> //to get messages from db, connection id
 }

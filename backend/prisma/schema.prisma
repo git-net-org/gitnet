@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -14,42 +8,80 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id           String        @id @default(uuid())
-  githubId     String        @unique
-  username     String        @unique
-  avatar       String
-  email        String        @unique
-  createdAt    DateTime      @default(now())
+enum ConnectionStatus {
+  PENDING
+  ACCEPTED
+  BLOCKED
+  REJECTED
+}
 
-  // Self-referencing many-to-many relation
+model User {
+  id             String   @id @default(uuid())
+  githubId       String   @unique
+  username       String   @unique
+  avatar         String
+  email          String   @unique
+  githubToken    String?
+  createdAt      DateTime @default(now())
+
   connectionsInitiated Connections[] @relation("UserConnectionsInitiated")
   connectionsReceived  Connections[] @relation("UserConnectionsReceived")
 
-   sentMessages     Messages[] @relation("SentMessages")
+  filteredConnections     FilteredConnections[] @relation("UserFilteredConnections")
+  filteredConnectionsToMe FilteredConnections[] @relation("ConnectedUserFilteredConnections")
+
+  sentMessages     Messages[] @relation("SentMessages")
   receivedMessages Messages[] @relation("ReceivedMessages")
 }
 
 model Connections {
   id            String   @id @default(uuid())
-
   userId        String
   connectionId  String
 
   user          User     @relation("UserConnectionsInitiated", fields: [userId], references: [id])
   connectedUser User     @relation("UserConnectionsReceived", fields: [connectionId], references: [id])
-  
+
+  createdAt     DateTime @default(now())
+
   @@unique([userId, connectionId])
 }
-model Messages {
-  id            String   @id @default(uuid())
-  connectionId  String
-  senderId      String
-  receiverId    String
-  content       String
-  sentAt        DateTime @default(now())
 
-  sender        User     @relation("SentMessages", fields: [senderId], references: [id])
-  receiver      User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+model FilteredConnections {
+  id                    String   @id @default(uuid())
+  userId                String
+  connectedUserId       String  
+  connectionId          String?  @unique
+
+  isConversationInvited Boolean @default(false)
+  isPlatformInvited     Boolean @default(false)
+
+  isMutual              Boolean
+  isFollower            Boolean
+  isFollowing           Boolean
+  allowed               Boolean @default(false)
+
+  invitedBy             String?  @default("")
+  connectedAt           DateTime?
+  connectionStatus      ConnectionStatus @default(PENDING)
+
+  createdAt             DateTime @default(now())
+
+
+  user             User @relation("UserFilteredConnections", fields: [userId], references: [id])
+  connectedUser    User @relation("ConnectedUserFilteredConnections", fields: [connectedUserId], references: [id])
+
+  @@unique([userId, connectedUserId])
 }
 
+model Messages {
+  id           String   @id @default(uuid())
+  connectionId String
+  senderId     String
+  receiverId   String
+  content      String
+  sentAt       DateTime @default(now())
+
+  sender       User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver     User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+}

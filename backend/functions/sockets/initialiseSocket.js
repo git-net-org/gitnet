@@ -2,10 +2,11 @@ import { Server } from "socket.io";
 import { socketEventHandlers } from "../socketHandler.js";
 
 
+let io;
 export const initializeSocketServer = (server) => {
-  const io = new Server(server, {
+  io = new Server(server, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: process.env.FRONTEND_URL || "http://localhost:3000",
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -19,3 +20,4 @@ export const initializeSocketServer = (server) => {
   console.log("Socket.IO server initialized");
   return io;
 };
+export const getSocketInstance = () => io
