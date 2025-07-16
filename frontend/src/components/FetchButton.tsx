@@ -12,7 +12,7 @@ const refreshContacts = async ()=>{
 }
 
     return (
-        <button className="bg-green-950 p-4 rounded-xl" onClick={refreshContacts}>
+        <button className="bg-green-950 p-4 rounded-xl" onClick={()=>refreshContacts}>
             Refresh
         </button>
     )

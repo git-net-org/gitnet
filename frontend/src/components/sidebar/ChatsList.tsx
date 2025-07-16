@@ -1,47 +1,89 @@
 "use client";
 
-import { useState } from "react";
-import { useUser } from "../../../store/userStore";
 import { useConnection } from "../../../store/connectionStore";
+import { useMessageStore } from "../../../store/messageStore";
+import { useActiveChat } from "../../../store/activeChatStore";
+import { useEffect, useState } from "react";
+import { useUser } from "../../../store/userStore";
 
-// This is a placeholder. In a real app, you would fetch messages from your API
 interface ChatPreview {
   id: string;
   userId: string;
   username: string;
   avatar?: string;
-  lastMessage: string;
-  timestamp: Date;
-  unread: boolean;
+  lastMessage?: string;
+  timeStamp? : string
 }
 
 export default function ChatsList() {
-  const { user } = useUser();
+  const {user} = useUser()
   const { connections } = useConnection();
+  const { message, populateMessage } = useMessageStore();
+  const { activeChatId, setActiveChatId } = useActiveChat();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    console.log("connections",connections)
+    const loadMessages = async () => {
+      setIsLoading(true);
+      if (connections && connections.length > 0) {
+        console.log("Loading messages for connections:", connections);
+        for (const conn of connections) {
+          if (conn.id) {
+            console.log("Loading messages for connection:", conn.connectionId);
+            await populateMessage(conn.id);
+          }
+        }
+      }
+      setIsLoading(false);
+    };
+    
+    loadMessages();
+  }, [connections, populateMessage]);
   
-  // Mock data - replace with actual data from your API
-  const [chats] = useState<ChatPreview[]>([
-    {
-      id: "1",
-      userId: "user1",
-      username: "Jane Smith",
-      avatar: "https://github.com/identicons/john.png",
-      lastMessage: "Hey, how's it going?",
-      timestamp: new Date(Date.now() - 1000 * 60 * 5), // 5 minutes ago
-      unread: true,
-    },
-    {
-      id: "2",
-      userId: "user2",
-      username: "Mike Johnson",
-      avatar: "https://github.com/identicons/mike.png",
-      lastMessage: "Did you see the new feature?",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-      unread: false,
-    }
-  ]);
   
-  if (chats.length === 0) {
+  // Extract chats that have messages
+  const chatPreviews: ChatPreview[] = connections
+    .filter(conn => 
+  {
+    return message[conn.id] && Array.isArray(message[conn.id])
+  }
+
+    )
+    .map((conn) => {
+      const msgs = message[conn.id];
+      const lastMsg = msgs[msgs.length - 1];
+      
+      return {
+        id: conn.id || "",
+        userId: conn?.connectedUser?.id || "",
+        username: conn.connectedUser?.username || "",
+        avatar: conn.connectedUser?.avatar || "",
+        lastMessage: lastMsg?.content || "",
+      };
+    });
+  
+  console.log("Final chatPreviews:", chatPreviews);
+
+  // Handle selecting a chat
+  const handleSelectChat = (chatId: string) => {
+    console.log("Selecting chat:", chatId);
+    setActiveChatId(chatId);
+  };
+  
+  if (isLoading) {
+    return (
+      <div className="p-6 text-center text-gray-500">
+        <div className="animate-pulse flex flex-col space-y-3">
+          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (chatPreviews.length === 0) {
     return (
       <div className="p-6 text-center text-gray-500">
         <p>No chats yet</p>
@@ -57,10 +99,12 @@ export default function ChatsList() {
       </h3>
       
       <div className="space-y-1">
-        {chats.map((chat) => (
+        {chatPreviews.map((chat) => (
           <div 
             key={chat.id}
-            className="flex items-center p-2 hover:bg-gray-50 rounded-md cursor-pointer"
+            onClick={() => handleSelectChat(chat.id)}
+            className={`flex items-center p-2 rounded-md cursor-pointer
+              ${activeChatId === chat.id ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
           >
             <div className="relative">
               <img 
@@ -68,41 +112,20 @@ export default function ChatsList() {
                 alt="Profile"
                 className="w-10 h-10 rounded-full mr-3"
               />
-              {chat.unread && (
-                <div className="absolute w-3 h-3 bg-blue-500 rounded-full top-0 right-3"></div>
-              )}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex justify-between items-baseline">
                 <h4 className="text-sm font-medium text-gray-800 truncate">
                   {chat.username}
                 </h4>
-                <span className="text-xs text-gray-500">
-                  {formatTime(chat.timestamp)}
-                </span>
               </div>
-              <p className="text-xs text-gray-500 truncate">{chat.lastMessage}</p>
+              {chat.lastMessage && (
+                <p className="text-xs text-gray-500 truncate">{chat.lastMessage}</p>
+              )}
             </div>
           </div>
         ))}
       </div>
     </div>
   );
-}
-
-function formatTime(date: Date): string {
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  
-  if (diff < 1000 * 60) {
-    return "just now";
-  } else if (diff < 1000 * 60 * 60) {
-    const mins = Math.floor(diff / (1000 * 60));
-    return `${mins}m ago`;
-  } else if (diff < 1000 * 60 * 60 * 24) {
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    return `${hours}h ago`;
-  } else {
-    return date.toLocaleDateString();
-  }
 }

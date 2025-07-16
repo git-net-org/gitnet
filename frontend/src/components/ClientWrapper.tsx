@@ -6,20 +6,49 @@ import { useConnection } from "../../store/connectionStore";
 import { useSocketStore } from "../../store/useSocketStore";
 
 export default function ClientWrapper({ children }: { children: ReactNode }) {
-  const { setUserData } = useUser();
+  const { user,setUserData } = useUser();
   const { setConnections } = useConnection();
-  const { createSocketConnection,disconnectSocketConnection} = useSocketStore();
+  const {socket, createSocketConnection,disconnectSocketConnection} = useSocketStore();
   
+  function setTabId()
+  {
+    const id = Math.random().toString(32).substring(2)
+    sessionStorage.setItem("tabId", id);
+  }
+
   useEffect(() => {
     setUserData();
     setConnections();
-     createSocketConnection();
+    createSocketConnection();
 
+    setTabId()
       return () => {
       disconnectSocketConnection();
     };
     
   }, []);
+// to amp all socket id ewith userID
+  useEffect(() => {
+    if (user && socket) {
+      let tabId = sessionStorage.getItem("tabId");
+
+      socket.emit("register", { userId: user.id, tabId });
+
+      socket.on("multiple_tab_blocked", () => {
+        alert("multiple tabs are not allowed");
+        socket.disconnect();
+
+        document.body.innerHTML = `
+    <div style="display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif">
+      <h2>This app is already open in another tab.</h2>
+    </div>
+  `;
+
+        throw new Error("Tab blocked due to multiple instances.");
+      });
+    }
+  }, [user, socket]);
+
 
   return <>{children}</>;
 }

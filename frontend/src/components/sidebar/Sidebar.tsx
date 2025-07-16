@@ -10,7 +10,7 @@ import ExploreMore from "./ExploreMore";
 type TabType = "chats" | "connections" | "explore";
 
 export default function Sidebar() {
-  const [activeTab, setActiveTab] = useState<TabType>("connections");
+  const [activeTab, setActiveTab] = useState<TabType>("chats");
 
   return (
     <div className="h-screen w-72 flex flex-col border-r border-gray-200 bg-white">

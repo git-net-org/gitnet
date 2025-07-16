@@ -12,6 +12,7 @@ export default function ConnectionsList() {
   const [invitingSent, setInvitingSent] = useState<Record<string, boolean>>({});
   const [selectedConnectionId, setSelectedConnectionId] = useState<string | null>(null);
 
+  console.log("CONNECTIONS",connections)
 
   const handleInvite = async (connectionId: string) => {
     try {
@@ -99,27 +100,35 @@ export default function ConnectionsList() {
               <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center mr-3">
                 {connection.user?.avatar ? (
                   <img 
-                    src={connection.user?.avatar} 
+                    src={connection.connectedUser?.avatar} 
                     alt="Profile" 
                     className="w-10 h-10 rounded-full"
                   />
                 ) : (
                   <span className="text-lg text-gray-500">
-                    {connection.user?.username?.charAt(0) || '?'}
+                    {connection.connectedUser?.username?.charAt(0) || '?'}
                   </span>
                 )}
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-800">
-                  {connection.user?.username || "Unknown User"}
+                  {connection.connectedUser?.username || "Unknown User"}
                 </p>
-                <p className="text-xs text-gray-500">
-                  {isMutualConnection(connection) ? "Connected" : "Not connected yet"}
+                <p className="text-xs text-gray-400">
+                  {isMutualConnection(connection) ? "Connected" : ""}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {connection.isFollower && !isMutualConnection(connection) ? "They follow you." : ""}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {connection.isFollowing && !isMutualConnection(connection) ? "you follow them." : ""}
                 </p>
               </div>
             </div>
-            
-            {!isMutualConnection(connection) && (
+            {/* isFollowing , no spamming sent a message, we will dispaly button to initiate convo */}
+            {/* isFollower, no spamming sent a message, we will dispaly button to initiate convo */}
+
+            {/* {!isMutualConnection(connection) && (
               <button
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent parent div click
@@ -134,7 +143,7 @@ export default function ConnectionsList() {
               >
                 {invitingSent[connection.id] ? "Invited" : "Connect"}
               </button>
-            )}
+            )} */}
           </div>
         ))}
       </div>
