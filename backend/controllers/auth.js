@@ -31,7 +31,7 @@ export const githubCallback = async (req, res) => {
 
   const userRes = await axios.get('https://api.github.com/user', {
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `token ${accessToken}`,
       Accept: 'application/json'
     }
   });
@@ -40,12 +40,15 @@ export const githubCallback = async (req, res) => {
 
   const user = await prisma.user.upsert({
     where: { githubId: id.toString() },
-    update: {},
+    update: {
+      githubToken: accessToken
+    },
     create: {
       githubId: id.toString(),
       username: login,
       email: email || null,
-      avatar: avatar_url
+      avatar: avatar_url,
+      githubToken: accessToken
     }
   });
 
@@ -72,7 +75,7 @@ export const githubCallback = async (req, res) => {
     httpOnly: false
   });
 
-  res.redirect('http://localhost:3000/');
+  res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
 };
 // export const logout = (req, res) => {
 //   res.clearCookie('token');
