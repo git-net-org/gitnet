@@ -27,7 +27,12 @@ export default function ConnectionsList() {
         {
           withCredentials: true,
           headers: {
-            "x-csrf-token": document.cookie.split("=")[1].split(";")[0],
+            "x-csrf-token": (() => {
+              const value = `; ${document.cookie}`;
+              const parts = value.split(`; csrfToken=`);
+              if (parts.length === 2) return parts.pop()?.split(';').shift();
+              return null;
+            })(),
           },
         }
       );

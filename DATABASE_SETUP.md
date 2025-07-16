@@ -34,7 +34,7 @@ postgresql://username:password@hostname:5432/database_name?sslmode=require
 cd backend
 ```
 
-### 2.2 Copy the Example File
+### 2.2 Copy the Backend Example File
 ```bash
 cp .env.example .env.local
 ```
@@ -52,9 +52,28 @@ DATABASE_URL='postgresql://your_actual_database_link_here'
 
 **Important**: Keep the single quotes around your database link!
 
+### 2.4 Set Up Frontend Environment
+1. Navigate to the frontend folder:
+   ```bash
+   cd ../frontend
+   ```
+
+2. Create a frontend environment file:
+   ```bash
+   echo "JWT_SECRET=your_jwt_secret_here" > .env.local
+   ```
+
+3. **Important**: Use the same JWT_SECRET value from your backend `.env.local` file
+
+**Note**: The frontend needs the JWT_SECRET to verify authentication tokens from the backend.
+
 ## Step 3: Install Everything (Auto-magic!)
 
-Run these commands one by one:
+Navigate back to the backend folder and run these commands one by one:
+
+```bash
+cd ../backend
+```
 
 ### 3.1 Install Project Dependencies
 ```bash
@@ -126,6 +145,13 @@ For detailed schema information, see [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md).
 1. Double-check your database link in `.env.local`
 2. Make sure your Neon database is still active (check neon.tech)
 3. Try running `npx prisma db push` instead
+
+### "403 Forbidden" or Authentication Errors
+**Problem**: Frontend can't authenticate with backend
+**Solution**: 
+1. Make sure both frontend and backend have the same `JWT_SECRET` in their `.env.local` files
+2. Check that both environment files exist and are properly configured
+3. Restart both frontend and backend servers after changing environment variables
 
 ### Still Stuck?
 1. Copy the exact error message
