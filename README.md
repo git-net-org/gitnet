@@ -1,5 +1,5 @@
 # GitNet 🧠💬
-
+![Alt text](image/gitnet.png)
 **Connect. Collaborate. Contribute.**  
 A privacy-first, GitHub-powered chat application that helps developers connect meaningfully — without ever sharing personal information.
 
