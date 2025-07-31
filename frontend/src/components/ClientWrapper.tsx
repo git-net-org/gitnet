@@ -4,6 +4,8 @@ import { ReactNode, useEffect } from "react";
 import { useUser } from "../../store/userStore";
 import { useConnection } from "../../store/connectionStore";
 import { useSocketStore } from "../../store/useSocketStore";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import ThemeWrapper from "@/components/ThemeWrapper";
 
 export default function ClientWrapper({ children }: { children: ReactNode }) {
   const { user,setUserData } = useUser();
@@ -50,5 +52,11 @@ export default function ClientWrapper({ children }: { children: ReactNode }) {
   }, [user, socket]);
 
 
-  return <>{children}</>;
+  return (
+    <ThemeProvider>
+      <ThemeWrapper>
+        {children}
+      </ThemeWrapper>
+    </ThemeProvider>
+  );
 }

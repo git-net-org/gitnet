@@ -222,7 +222,7 @@ export default function ChatWindow({ activeChat }: ChatWindowProps) {
       {activeChat ? (
         <>
           {/* Header */}
-          <div className="border-b px-4 py-3 flex items-center gap-3 bg-gray-50">
+          <div className="border-b px-4 py-3 flex items-center gap-3 bg-gray-100">
             <img
               src={
                 activeConnection?.connectedUser?.avatar ||
@@ -241,12 +241,12 @@ export default function ChatWindow({ activeChat }: ChatWindowProps) {
             </div>
           </div>{" "}
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-3 bg-gray-100 space-y-2">
+          <div className="flex-1 overflow-y-auto px-4 py-3 bg-gray-50 space-y-2">
             {activeConnection?.isConversationInvited &&
               activeConnection?.connectionStatus === "ACCEPTED" && (
                 <div className="flex justify-center mb-4">
-                  <p className="bg-gray-200 text-gray-600 text-xs px-3 py-1 rounded-full max-w-fit text-center">
-                    This is the beginning of your conversation
+                  <p className="bg-gray-300 text-gray-700 text-sm px-4 py-2 rounded-full max-w-fit text-center">
+                    This is the beginning of your legendary conversation
                   </p>
                 </div>
               )}
@@ -263,8 +263,8 @@ export default function ChatWindow({ activeChat }: ChatWindowProps) {
                     }`}
                   >
                     <div
-                      className={`rounded-xl px-4 py-2 text-sm max-w-[70%] shadow-md ${
-                        isSelf ? "bg-blue-500 text-white" : "bg-white text-gray-800"
+                      className={`rounded-xl px-4 py-2 text-sm max-w-[70%] shadow-sm ${
+                        isSelf ? "bg-blue-500 text-white" : "bg-black border"
                       }`}
                     >
                       <p>{msg.content}</p>
@@ -286,99 +286,94 @@ export default function ChatWindow({ activeChat }: ChatWindowProps) {
           </div>
           {!activeConnection?.allowed &&
             !activeConnection?.isConversationInvited && (
-              <div className="p-4 bg-gray-50 border-t">
-                <button
-                  onClick={() => handleInvite(activeConnection?.id || "")}
-                  className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition"
-                >
-                  Invite to Chat
-                </button>
-              </div>
+              <button
+                onClick={() => handleInvite(activeConnection?.id || "")}
+                className="text-center text-red-400 py-5"
+              >
+                Invite
+              </button>
             )}
           {activeConnection?.isConversationInvited &&
             activeConnection?.connectionStatus !== "ACCEPTED" &&
             activeConnection.invitedBy !== user?.username && (
-              <div className="p-4 bg-gray-50 border-t">
-                <button
-                  onClick={() => acceptInvite(activeConnection?.id || "")}
-                  disabled={activeConnection.invitedBy == user?.username}
-                  className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition"
-                >
-                  Accept Invitation
-                </button>
-              </div>
+              <button
+                onClick={() => acceptInvite(activeConnection?.id || "")}
+                disabled={activeConnection.invitedBy == user?.username}
+                className="text-center bg-green-400 py-5"
+              >
+                Accept
+              </button>
             )}
           <form
             onSubmit={sendMessage}
             className="border-t bg-white px-4 py-3 flex items-center space-x-2"
           >
-            <div className="relative flex-1">
-              <input
-                type="text"
-                disabled={
-                  activeConnection?.allowed
-                    ? false
-                    : message[activeChat] && message[activeChat].length === 1
-                    ? true
-                    : false
+            <input
+              type="text"
+              disabled={
+                activeConnection?.allowed
+                  ? false
+                  : message[activeChat] && message[activeChat].length === 1
+                  ? true
+                  : false
+              }
+              value={inputMessage}
+              onChange={(e) => {
+                setinputMessage(e.target.value);
+
+                // Emit typing event
+                emitTyping();
+
+                // Clear existing timeout
+                if (typingTimeoutRef.current) {
+                  clearTimeout(typingTimeoutRef.current);
                 }
-                value={inputMessage}
-                onChange={(e) => {
-                  setinputMessage(e.target.value);
 
-                  // Emit typing event
-                  emitTyping();
-
-                  // Clear existing timeout
-                  if (typingTimeoutRef.current) {
-                    clearTimeout(typingTimeoutRef.current);
-                  }
-
-                  // Set new timeout to stop typing after 1 second of inactivity
-                  typingTimeoutRef.current = setTimeout(() => {
-                    emitStopTyping();
-                  }, 1000);
-                }}
-                onBlur={() => {
-                  // Stop typing when input loses focus
+                // Set new timeout to stop typing after 1 second of inactivity
+                typingTimeoutRef.current = setTimeout(() => {
+                  emitStopTyping();
+                }, 1000);
+              }}
+              onBlur={() => {
+                // Stop typing when input loses focus
+                emitStopTyping();
+                if (typingTimeoutRef.current) {
+                  clearTimeout(typingTimeoutRef.current);
+                }
+              }}
+              onKeyDown={(e) => {
+                // Stop typing when user presses Enter (sends message)
+                if (e.key === 'Enter') {
                   emitStopTyping();
                   if (typingTimeoutRef.current) {
                     clearTimeout(typingTimeoutRef.current);
                   }
-                }}
-                onKeyDown={(e) => {
-                  // Stop typing when user presses Enter (sends message)
-                  if (e.key === 'Enter') {
-                    emitStopTyping();
-                    if (typingTimeoutRef.current) {
-                      clearTimeout(typingTimeoutRef.current);
-                    }
-                  }
-                }}
-                placeholder={
-                  !activeConnection?.isMutual
-                    ? "You can only message mutual connections"
-                    : "Type a message..."
                 }
-                className={`w-full ${
-                  !activeConnection?.isMutual
-                    ? "cursor-not-allowed bg-gray-100"
-                    : "bg-gray-100"
-                } text-black rounded-full border-transparent focus:border-blue-500 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500`}
-              />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                <EmojiPicker
-                  onEmojiClick={(e) => {
-                    console.log(inputMessage + e.emoji);
-                    setinputMessage(inputMessage + e.emoji);
-                  }}
-                  open={emojiOpen}
-                />
-              </div>
-            </div>
+              }}
+              placeholder={
+                !activeConnection?.isMutual
+                  ? "You can only message mutual connections"
+                  : "Type a message..."
+              }
+              className={`flex-1 ${
+                !activeConnection?.isMutual
+                  ? "cursor-not-allowed bg-gray-100"
+                  : ""
+              } text-black rounded-full border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            />
             <button type="button"
-              onClick={() => setEmojiOpen(prev => !prev)}
-              className="text-gray-500 hover:text-gray-700 p-2 rounded-full">
+            className="absolute bottom-20 right-30 ">
+              <EmojiPicker
+              onEmojiClick={(e) => {
+                console.log(inputMessage + e.emoji);
+                setinputMessage(inputMessage + e.emoji);
+              }}
+              open={emojiOpen}
+              />
+            </button>
+            <button type="button"
+            onClick={()=>setEmojiOpen(prev=> !prev)}
+            className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full">
               <Smile />
             </button>
             <button

@@ -24,3 +24,58 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Hero Section Animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes float-delay {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(2deg); }
+}
+
+@keyframes float-slow-delay {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-7px) rotate(-2deg); }
+}
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes draw {
+  from { stroke-dasharray: 1000; stroke-dashoffset: 1000; }
+  to { stroke-dasharray: 1000; stroke-dashoffset: 0; }
+}
+
+@keyframes draw-delay {
+  0%, 50% { stroke-dasharray: 1000; stroke-dashoffset: 1000; }
+  100% { stroke-dasharray: 1000; stroke-dashoffset: 0; }
+}
+
+.animate-fade-in { animation: fade-in 1s ease-out forwards; }
+.animate-fade-in-up { animation: fade-in-up 1s ease-out 0.3s forwards; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-float-delay { animation: float-delay 3s ease-in-out infinite 0.5s; }
+.animate-float-slow { animation: float-slow 4s ease-in-out infinite; }
+.animate-float-slow-delay { animation: float-slow-delay 4s ease-in-out infinite 1s; }
+.animate-bounce-slow { animation: bounce-slow 2s ease-in-out infinite 1.5s; }
+.animate-draw { animation: draw 2s ease-in-out infinite; }
