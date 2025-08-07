@@ -82,4 +82,85 @@ Please read our [**Contributing Guidelines**](CONTRIBUTING.md) before submitting
    cd ../backend  # for backend
    npm install
 
+## 🐳 Docker Setup
 
+A full Docker-based development setup for the GitNet project, including backend, frontend, and PostgreSQL database.
+
+---
+
+### 🔧 Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+---
+
+### 📦 Services Overview
+
+| Service     | URL                     | Port Mapping     |
+|-------------|--------------------------|------------------|
+| Frontend    | http://localhost:3000   | `3000:3000`      |
+| Backend API | http://localhost:5000   | `5000:5000`      |
+| PostgreSQL  | —                        | `5432:5432`      |
+
+### Backend + Database (Docker Compose)
+
+1. **Navigate to backend directory:**
+   ```bash
+   cd backend
+   ```
+
+2. **Configure environment variables:**
+   Copy `.env.example` to `.env` and fill in your values:
+
+   - `GITHUB_CLIENT_ID`: Your GitHub OAuth client ID
+   - `GITHUB_CLIENT_SECRET`: Your GitHub OAuth client secret
+   - `JWT_SECRET` : Your JWT secret
+
+
+3. **Start backend and database:**
+   ```bash
+   docker-compose up --build
+   ```
+
+   **Services:**
+   - Backend API: http://localhost:5000
+   - PostgreSQL: localhost:5432 (user: `gitnet`, pass: `gitnetpass`, db: `gitnetdb`)
+
+4. **Stop services:**
+   ```bash
+   docker-compose down
+   ```
+
+### Frontend (Standalone Docker)
+
+1. **Build the frontend image:**
+   ```bash
+   cd frontend
+   docker build -t gitnet-frontend .
+   ```
+
+2. **Run the frontend container:**
+   ```bash
+   docker run -p 3000:3000 gitnet-frontend
+   ```
+
+   **Frontend:** http://localhost:3000
+
+
+### Database Management
+
+**Access PostgreSQL:**
+```bash
+# Via Docker Compose
+docker-compose exec postgres psql -U gitnet -d gitnetdb
+
+# Or connect from host
+psql -h localhost -p 5432 -U gitnet -d gitnetdb
+```
+
+**Reset database:**
+```bash
+docker-compose down -v  # Removes volumes
+docker-compose up --build
+```
